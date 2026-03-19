@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
+
+    body{display:flex;background:#f4f6f9;}
+
+    /* SIDEBAR */
+    .sidebar{
+      width:230px;height:100vh;background:#111827;color:white;padding:20px;
+    }
+    .sidebar h2{text-align:center;margin-bottom:30px;}
+    .sidebar a{display:block;padding:10px;margin:10px 0;color:white;text-decoration:none;border-radius:8px;}
+    .sidebar a:hover{background:#2563eb;}
+
+    /* MAIN */
+    .main{flex:1;padding:20px;}
+
+    /* HEADER */
+    .header{
+      background:white;padding:15px;border-radius:10px;margin-bottom:20px;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+
+    /* STATS */
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:15px;
+      margin-bottom:20px;
+    }
+
+    .card{
+      background:white;padding:15px;border-radius:12px;text-align:center;
+      box-shadow:0 3px 10px rgba(0,0,0,0.05);
+    }
+
+    /* FORM */
+    .box{
+      background:white;padding:20px;border-radius:10px;margin-bottom:20px;
+      max-width:350px;
+    }
+
+    input{width:100%;padding:10px;margin:5px 0;}
+
+    button{
+      padding:10px;border:none;border-radius:6px;cursor:pointer;margin-top:5px;
+    }
+
+    .create{background:#16a34a;color:white;width:100%;}
+    .delete{background:red;color:white;}
+    .download{background:#2563eb;color:white;}
+    .clear{background:gray;color:white;}
+
+    /* TABLE */
+    .table-box{overflow-x:auto;}
+    table{width:100%;background:white;border-radius:10px;min-width:500px;}
+    th,td{padding:10px;border-bottom:1px solid #ddd;text-align:center;}
+    th{background:#111827;color:white;}
+
+    /* MOBILE NAV */
+    .bottom-nav{
+      display:none;
+    }
+
+    /* MOBILE */
+    @media(max-width:768px){
+      body{display:block;}
+      .sidebar{display:none;}
+
+      .header{
+        position:sticky;
+        top:0;
+        border-radius:0;
+      }
+
+      .main{padding:15px;padding-bottom:80px;}
+
+      .stats{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .box{max-width:100%;}
+
+      .bottom-nav{
+        position:fixed;
+        bottom:0;
+        width:100%;
+        background:white;
+        display:flex;
+        justify-content:space-around;
+        padding:10px;
+        box-shadow:0 -2px 10px rgba(0,0,0,0.1);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>👨‍💼 Admin</h2>
+  <a href="#">Dashboard</a>
+  <a href="#">Students</a>
+  <a href="#">Reports</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <h3>Admin Dashboard</h3>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="card">👨‍🎓 Students<br><span id="total">0</span></div>
+    <div class="card">📝 Tests<br>10</div>
+    <div class="card">📚 Courses<br>5</div>
+    <div class="card">📊 Active<br>80%</div>
+  </div>
+
+  <!-- CREATE -->
+  <div class="box">
+    <h3>Create Student</h3>
+    <input id="name" placeholder="Name">
+    <input id="username" placeholder="Username">
+    <input id="password" placeholder="Password">
+    <button class="create" onclick="createStudent()">Create</button>
+  </div>
+
+  <!-- ACTIONS -->
+  <button class="download" onclick="downloadData()">Download</button>
+  <button class="clear" onclick="clearAll()">Clear</button>
+
+  <!-- TABLE -->
+  <div class="table-box">
+    <table id="studentTable"></table>
+  </div>
+
+</div>
+
+<!-- MOBILE NAV -->
+<div class="bottom-nav">
+  <div>🏠</div>
+  <div>👨‍🎓</div>
+  <div>📊</div>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbw_ZtFzr_xRH1UbtudQ07R0U2Jg45ek9ytbeiLoFXRIDQPdDjUlI62ubrYHdTC9MG7F/exec";
+
+window.onload = loadStudents;
+
+// CREATE
+async function createStudent(){
+  await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"create",
+      name:name.value,
+      username:username.value,
+      password:password.value
+    })
+  });
+  alert("Created");
+  loadStudents();
+}
+
+// LOAD
+async function loadStudents(){
+  let res=await fetch(API);
+  let data=await res.json();
+
+  document.getElementById("total").innerText = data.length-1;
+
+  let html=`<tr>
+    <th>Name</th><th>User</th><th>Pass</th><th>Action</th>
+  </tr>`;
+
+  data.slice(1).forEach(r=>{
+    html+=`<tr>
+      <td>${r[1]}</td>
+      <td>${r[2]}</td>
+      <td>${r[3]}</td>
+      <td><button class="delete" onclick="deleteRow('${r[0]}')">Delete</button></td>
+    </tr>`;
+  });
+
+  studentTable.innerHTML=html;
+}
+
+// DELETE
+async function deleteRow(id){
+  if(!confirm("Delete student?")) return;
+
+  await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({action:"delete",id})
+  });
+
+  loadStudents();
+}
+
+// CLEAR UI
+function clearAll(){
+  studentTable.innerHTML="";
+}
+
+// DOWNLOAD
+async function downloadData(){
+  let res=await fetch(API);
+  let data=await res.json();
+
+  let csv=data.map(r=>r.join(",")).join("\n");
+
+  let blob=new Blob([csv]);
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="students.csv";
+  a.click();
+}
+
+// LOGOUT
+function logout(){
+  location.href="index.html";
+}
+</script>
+
+</body>
+</html>

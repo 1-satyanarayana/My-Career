@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LMS Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial; background:#f4f6f9; text-align:center; }
+    .box { background:white; padding:25px; margin:100px auto; width:300px; border-radius:10px; }
+    input, button { margin:8px; padding:10px; width:90%; }
+    button { background:#2563eb; color:white; border:none; }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>🎓 LMS Login</h2>
+  <input id="user" placeholder="Username">
+  <input id="pass" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbw_ZtFzr_xRH1UbtudQ07R0U2Jg45ek9ytbeiLoFXRIDQPdDjUlI62ubrYHdTC9MG7F/exec";
+
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "1234";
+
+function login() {
+  let u = user.value;
+  let p = pass.value;
+
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    location.href = "admin.html";
+  } else {
+    studentLogin(u, p);
+  }
+}
+
+async function studentLogin(u,p){
+  let res = await fetch(API);
+  let data = await res.json();
+
+  let found = data.find(r => r[2]==u && r[3]==p);
+
+  if(found){
+    localStorage.setItem("studentName", found[1]);
+    location.href="students.html";
+  } else {
+    alert("Invalid Login");
+  }
+}
+</script>
+
+</body>
+</html>

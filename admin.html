@@ -4,14 +4,16 @@
   <title>Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
   <style>
     *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
 
-    body{display:flex;background:#f4f6f9;}
+    body{
+      display:flex;
+      background:linear-gradient(135deg,#1e3a8a,#2563eb);
+    }
 
-    /* SIDEBAR */
     .sidebar{
       width:230px;height:100vh;background:#111827;color:white;padding:20px;
     }
@@ -19,35 +21,34 @@
     .sidebar a{display:block;padding:10px;margin:10px 0;color:white;text-decoration:none;border-radius:8px;}
     .sidebar a:hover{background:#2563eb;}
 
-    /* MAIN */
     .main{flex:1;padding:20px;}
 
-    /* HEADER */
     .header{
-      background:white;padding:15px;border-radius:10px;margin-bottom:20px;
+      background:white;padding:15px;border-radius:12px;margin-bottom:20px;
       display:flex;justify-content:space-between;align-items:center;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
     }
 
-    /* STATS */
     .stats{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:15px;
-      margin-bottom:20px;
+      display:grid;grid-template-columns:repeat(4,1fr);
+      gap:15px;margin-bottom:20px;
     }
 
     .card{
-      background:white;padding:15px;border-radius:12px;text-align:center;
-      box-shadow:0 3px 10px rgba(0,0,0,0.05);
+      background:white;padding:20px;border-radius:12px;text-align:center;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
     }
 
-    /* FORM */
     .box{
-      background:white;padding:20px;border-radius:10px;margin-bottom:20px;
-      max-width:350px;
+      background:white;padding:20px;border-radius:12px;margin-bottom:20px;
+      max-width:400px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
     }
 
-    input{width:100%;padding:10px;margin:5px 0;}
+    input{
+      width:100%;padding:10px;margin:5px 0;
+      border-radius:6px;border:1px solid #ccc;
+    }
 
     button{
       padding:10px;border:none;border-radius:6px;cursor:pointer;margin-top:5px;
@@ -58,61 +59,26 @@
     .download{background:#2563eb;color:white;}
     .clear{background:gray;color:white;}
 
-    /* TABLE */
-    .table-box{overflow-x:auto;}
-    table{width:100%;background:white;border-radius:10px;min-width:500px;}
+    table{
+      width:100%;
+      background:white;
+      border-radius:10px;
+      overflow:hidden;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    }
+
     th,td{padding:10px;border-bottom:1px solid #ddd;text-align:center;}
     th{background:#111827;color:white;}
-
-    /* MOBILE NAV */
-    .bottom-nav{
-      display:none;
-    }
-
-    /* MOBILE */
-    @media(max-width:768px){
-      body{display:block;}
-      .sidebar{display:none;}
-
-      .header{
-        position:sticky;
-        top:0;
-        border-radius:0;
-      }
-
-      .main{padding:15px;padding-bottom:80px;}
-
-      .stats{
-        grid-template-columns:1fr 1fr;
-      }
-
-      .box{max-width:100%;}
-
-      .bottom-nav{
-        position:fixed;
-        bottom:0;
-        width:100%;
-        background:white;
-        display:flex;
-        justify-content:space-around;
-        padding:10px;
-        box-shadow:0 -2px 10px rgba(0,0,0,0.1);
-      }
-    }
   </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <h2>👨‍💼 Admin</h2>
   <a href="#">Dashboard</a>
-  <a href="#">Students</a>
-  <a href="#">Reports</a>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
   <div class="header">
@@ -128,59 +94,100 @@
     <div class="card">📊 Active<br>80%</div>
   </div>
 
-  <!-- CREATE -->
+  <!-- CREATE STUDENT 
   <div class="box">
     <h3>Create Student</h3>
-    <input id="name" placeholder="Name">
     <input id="username" placeholder="Username">
+    <input id="name" placeholder="Name">
+    <input id="branch" placeholder="Branch">
+    <input id="section" placeholder="Section">
+    <input id="college" placeholder="College Name">
     <input id="password" placeholder="Password">
+
     <button class="create" onclick="createStudent()">Create</button>
+  </div> -->
+
+  <!-- UPLOAD CSV -->
+  <div class="box">
+    <h3>📂 Upload CSV</h3>
+    <input type="file" id="fileInput" accept=".csv">
+    <button class="create" onclick="uploadFile()">Upload & Create</button>
   </div>
 
   <!-- ACTIONS -->
   <button class="download" onclick="downloadData()">Download</button>
   <button class="clear" onclick="clearAll()">Clear</button>
 
-  <!-- TABLE --><div class="table-box"><table id="studentTable"></table></div></div><!-- MOBILE NAV --><div class="bottom-nav"><div>🏠</div><div>👨‍🎓</div><div>📊</div></div><script>const API = "https://script.google.com/macros/s/AKfycbw_ZtFzr_xRH1UbtudQ07R0U2Jg45ek9ytbeiLoFXRIDQPdDjUlI62ubrYHdTC9MG7F/exec";
+  <!-- TABLE -->
+  <table id="studentTable"></table>
+
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbzKB7GwzognSyl6ZCgpi2U4GlFkVjLP6z7TAW8SAxDmv0kt_gWsQyAU1JVzPJ3FgXtLIg/exec";
 
 window.onload = loadStudents;
 
 // CREATE
 async function createStudent(){
+  if(!username.value || !name.value){
+    alert("Fill all required fields");
+    return;
+  }
+
   await fetch(API,{
     method:"POST",
     body:JSON.stringify({
       action:"create",
-      name:name.value,
       username:username.value,
+      name:name.value,
+      branch:branch.value,
+      section:section.value,
+      college:college.value,
       password:password.value
     })
   });
-  alert("Created");
+
+  alert("Student Created ✅");
+
+  // clear inputs
+  username.value=name.value=branch.value=section.value=college.value=password.value="";
+
   loadStudents();
 }
 
 // LOAD
 async function loadStudents(){
-  let res=await fetch(API);
-  let data=await res.json();
+  let res = await fetch(API);
+  let data = await res.json();
 
-  document.getElementById("total").innerText = data.length-1;
+  data.shift();
 
-  let html=`<tr>
-    <th>Name</th><th>User</th><th>Pass</th><th>Action</th>
+  document.getElementById("total").innerText = data.length;
+
+  let html = `<tr>
+    <th>Username</th>
+    <th>Name</th>
+    <th>Branch</th>
+    <th>Section</th>
+    <th>College</th>
+    <th>Password</th>
+    <th>Action</th>
   </tr>`;
 
-  data.slice(1).forEach(r=>{
-    html+=`<tr>
+  data.forEach(r=>{
+    html += `<tr>
       <td>${r[1]}</td>
       <td>${r[2]}</td>
       <td>${r[3]}</td>
+      <td>${r[4]}</td>
+      <td>${r[5]}</td>
+      <td>${r[6]}</td>
       <td><button class="delete" onclick="deleteRow('${r[0]}')">Delete</button></td>
     </tr>`;
   });
 
-  studentTable.innerHTML=html;
+  studentTable.innerHTML = html;
 }
 
 // DELETE
@@ -189,29 +196,64 @@ async function deleteRow(id){
 
   await fetch(API,{
     method:"POST",
-    body:JSON.stringify({action:"delete",id})
+    body:JSON.stringify({action:"delete", id})
   });
 
   loadStudents();
 }
 
-// CLEAR UI
-function clearAll(){
-  studentTable.innerHTML="";
+// CSV UPLOAD
+function uploadFile(){
+  let file = fileInput.files[0];
+  if(!file){ alert("Select CSV file"); return; }
+
+  let reader = new FileReader();
+
+  reader.onload = async function(e){
+    let rows = e.target.result.split("\n").map(r=>r.split(","));
+    rows.shift();
+
+    for(let r of rows){
+      if(r.length<6) continue;
+
+      await fetch(API,{
+        method:"POST",
+        body:JSON.stringify({
+          action:"create",
+          username:r[0],
+          name:r[1],
+          branch:r[2],
+          section:r[3],
+          college:r[4],
+          password:r[5]
+        })
+      });
+    }
+
+    alert("Upload Completed ✅");
+    loadStudents();
+  };
+
+  reader.readAsText(file);
 }
 
 // DOWNLOAD
 async function downloadData(){
-  let res=await fetch(API);
-  let data=await res.json();
+  let res = await fetch(API);
+  let data = await res.json();
 
-  let csv=data.map(r=>r.join(",")).join("\n");
+  let csv = data.map(r=>r.join(",")).join("\n");
 
-  let blob=new Blob([csv]);
-  let a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
+  let blob = new Blob([csv]);
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
   a.download="students.csv";
   a.click();
+}
+
+// CLEAR UI
+function clearAll(){
+  studentTable.innerHTML="";
 }
 
 // LOGOUT

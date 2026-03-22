@@ -1,36 +1,120 @@
 <!DOCTYPE html>
-<html><head><title>LMS Login</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>body { font-family: Arial; background:#f4f6f9; text-align:center; }.box { background:white; padding:25px; margin:100px auto; width:300px; border-radius:10px; } input, button { margin:8px; padding:10px; width:90%; }
-    button { background:#2563eb; color:white; border:none; }
+<html>
+<head>
+  <title>LMS Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial;
+      background: linear-gradient(135deg,#2563eb,#1e3a8a);
+      text-align: center;
+      margin: 0;
+    }
+
+    .box {
+      background: white;
+      padding: 30px;
+      margin: 120px auto;
+      width: 320px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      margin: 10px;
+      padding: 12px;
+      width: 90%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #2563eb;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px;
+      width: 95%;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #1e40af;
+    }
   </style>
 </head>
 
 <body>
 
-<div class="box"><h2>🎓 LMS Login</h2><input id="user" placeholder="Username"><input id="pass" type="password" placeholder="Password"><button onclick="login()">Login</button></div><script>const API = "https://script.google.com/macros/s/AKfycbw_ZtFzr_xRH1UbtudQ07R0U2Jg45ek9ytbeiLoFXRIDQPdDjUlI62ubrYHdTC9MG7F/exec";const ADMIN_USER = "admin@mycareer.com";const ADMIN_PASS = "mycareer123";
+<div class="box">
+  <h2>🎓 LMS Login</h2>
+
+  <input id="user" placeholder="Username">
+  <input id="pass" type="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbzKB7GwzognSyl6ZCgpi2U4GlFkVjLP6z7TAW8SAxDmv0kt_gWsQyAU1JVzPJ3FgXtLIg/exec";
+
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "1234";
 
 function login() {
-  let u = user.value;
-  let p = pass.value;
+  let u = document.getElementById("user").value.trim();
+  let p = document.getElementById("pass").value.trim();
+
+  if (!u || !p) {
+    alert("Please enter username and password");
+    return;
+  }
 
   if (u === ADMIN_USER && p === ADMIN_PASS) {
-    location.href = "admin.html";
+    window.location.href = "admin.html";
   } else {
     studentLogin(u, p);
   }
 }
 
-async function studentLogin(u,p){
-  let res = await fetch(API);
-  let data = await res.json();
+async function studentLogin(u, p) {
+  try {
+    let res = await fetch(API);
+    let data = await res.json();
 
-  let found = data.find(r => r[2]==u && r[3]==p);
+    // Skip header row
+    data.shift();
 
-  if(found){
-    localStorage.setItem("studentName", found[1]);
-    location.href="students.html";
-  } else {
-    alert("Invalid Login");
+    // ✅ Correct mapping
+    let found = data.find(r => r[1] == u && r[6] == p);
+
+    if (found) {
+      localStorage.setItem("studentName", found[2]);
+      localStorage.setItem("roll", found[1]);
+      localStorage.setItem("branch", found[3]);
+      localStorage.setItem("section", found[4]);
+      localStorage.setItem("college", found[5]);
+
+      window.location.href = "students.html";
+    } else {
+      alert("Invalid Username or Password");
+    }
+
+  } catch (err) {
+    alert("Server error. Try again!");
+    console.error(err);
   }
 }
 </script>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
+
+    body{
+      display:flex;
+      background:linear-gradient(135deg,#1e3a8a,#2563eb);
+    }
+
+    .sidebar{
+      width:230px;height:100vh;background:#111827;color:white;padding:20px;
+    }
+    .sidebar h2{text-align:center;margin-bottom:30px;}
+    .sidebar a{display:block;padding:10px;margin:10px 0;color:white;text-decoration:none;border-radius:8px;}
+    .sidebar a:hover{background:#2563eb;}
+
+    .main{flex:1;padding:20px;}
+
+    .header{
+      background:white;padding:15px;border-radius:12px;margin-bottom:20px;
+      display:flex;justify-content:space-between;align-items:center;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .stats{
+      display:grid;grid-template-columns:repeat(4,1fr);
+      gap:15px;margin-bottom:20px;
+    }
+
+    .card{
+      background:white;padding:20px;border-radius:12px;text-align:center;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .box{
+      background:white;padding:20px;border-radius:12px;margin-bottom:20px;
+      max-width:400px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    input{
+      width:100%;padding:10px;margin:5px 0;
+      border-radius:6px;border:1px solid #ccc;
+    }
+
+    button{
+      padding:10px;border:none;border-radius:6px;cursor:pointer;margin-top:5px;
+    }
+
+    .create{background:#16a34a;color:white;width:100%;}
+    .delete{background:red;color:white;}
+    .download{background:#2563eb;color:white;}
+    .clear{background:gray;color:white;}
+
+    table{
+      width:100%;
+      background:white;
+      border-radius:10px;
+      overflow:hidden;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    th,td{padding:10px;border-bottom:1px solid #ddd;text-align:center;}
+    th{background:#111827;color:white;}
+  </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>👨‍💼 Admin</h2>
+  <a href="admin.html">Dashboard</a>
+  <a href="Amaterial.html">Materials</a>
+</div>
+
+<div class="main">
+
+  <div class="header">
+    <h3>Admin Dashboard</h3>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <!-- STATS 
+  <div class="stats">
+    <div class="card">👨‍🎓 Students<br><span id="total">0</span></div>
+    <div class="card">📝 Tests<br>10</div>
+    <div class="card">📚 Courses<br>5</div>
+    <div class="card">📊 Active<br>80%</div>
+  </div>-->
+
+  <!-- CREATE STUDENT 
+  <div class="box">
+    <h3>Create Student</h3>
+    <input id="username" placeholder="Username">
+    <input id="name" placeholder="Name">
+    <input id="branch" placeholder="Branch">
+    <input id="section" placeholder="Section">
+    <input id="college" placeholder="College Name">
+    <input id="password" placeholder="Password">
+
+    <button class="create" onclick="createStudent()">Create</button>
+  </div> -->
+
+  <!-- UPLOAD CSV 
+  <div class="box">
+    <h3>📂 Upload CSV</h3>
+    <input type="file" id="fileInput" accept=".csv">
+    <button class="create" onclick="uploadFile()">Upload & Create</button>
+  </div>-->
+
+  <!-- ACTIONS 
+  <button class="download" onclick="downloadData()">Download</button>
+  <button class="clear" onclick="clearAll()">Clear</button>-->
+
+  <!-- TABLE 
+  <table id="studentTable"></table>-->
+  class="bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen flex items-center justify-center p-4"
+  >
+    <div
+      class="w-full max-w-md bg-white/90 backdrop-blur rounded-2xl shadow-xl p-6"
+    >
+      <h2 class="text-xl font-semibold text-indigo-600 mb-4 text-center">
+        Admin Panel
+      </h2>
+
+      <input
+        id="title"
+        placeholder="Material Title"
+        class="w-full p-3 border rounded-lg mb-3 focus:ring-2 focus:ring-indigo-400 outline-none"
+      />
+
+      <input
+        id="pdfUrl"
+        placeholder="PDF URL"
+        class="w-full p-3 border rounded-lg mb-3 focus:ring-2 focus:ring-indigo-400 outline-none"
+      />
+
+      <button
+        onclick="addMaterial()"
+        class="w-full bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 transition mb-3"
+      >
+        Add Material
+      </button>
+
+      <button
+        onclick="loadMaterials()"
+        class="w-full bg-gray-200 p-2 rounded-lg hover:bg-gray-300 transition text-sm"
+      >
+        Refresh List
+      </button>
+
+      <!-- Material List -->
+      <div id="adminList" class="mt-4 max-h-40 overflow-y-auto"></div>
+    </div>
+
+
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbzKB7GwzognSyl6ZCgpi2U4GlFkVjLP6z7TAW8SAxDmv0kt_gWsQyAU1JVzPJ3FgXtLIg/exec";
+
+window.onload = loadStudents;
+
+// CREATE
+async function createStudent(){
+  if(!username.value || !name.value){
+    alert("Fill all required fields");
+    return;
+  }
+
+  await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"create",
+      username:username.value,
+      name:name.value,
+      branch:branch.value,
+      section:section.value,
+      college:college.value,
+      password:password.value
+    })
+  });
+
+  alert("Student Created ✅");
+
+  // clear inputs
+  username.value=name.value=branch.value=section.value=college.value=password.value="";
+
+  loadStudents();
+}
+
+// LOAD
+async function loadStudents(){
+  let res = await fetch(API);
+  let data = await res.json();
+
+  data.shift();
+
+  document.getElementById("total").innerText = data.length;
+
+  let html = `<tr>
+    <th>Username</th>
+    <th>Name</th>
+    <th>Branch</th>
+    <th>Section</th>
+    <th>College</th>
+    <th>Password</th>
+    <th>Action</th>
+  </tr>`;
+
+  data.forEach(r=>{
+    html += `<tr>
+      <td>${r[1]}</td>
+      <td>${r[2]}</td>
+      <td>${r[3]}</td>
+      <td>${r[4]}</td>
+      <td>${r[5]}</td>
+      <td>${r[6]}</td>
+      <td><button class="delete" onclick="deleteRow('${r[0]}')">Delete</button></td>
+    </tr>`;
+  });
+
+  studentTable.innerHTML = html;
+}
+
+// DELETE
+async function deleteRow(id){
+  if(!confirm("Delete student?")) return;
+
+  await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({action:"delete", id})
+  });
+
+  loadStudents();
+}
+
+// CSV UPLOAD
+function uploadFile(){
+  let file = fileInput.files[0];
+  if(!file){ alert("Select CSV file"); return; }
+
+  let reader = new FileReader();
+
+  reader.onload = async function(e){
+    let rows = e.target.result.split("\n").map(r=>r.split(","));
+    rows.shift();
+
+    for(let r of rows){
+      if(r.length<6) continue;
+
+      await fetch(API,{
+        method:"POST",
+        body:JSON.stringify({
+          action:"create",
+          username:r[0],
+          name:r[1],
+          branch:r[2],
+          section:r[3],
+          college:r[4],
+          password:r[5]
+        })
+      });
+    }
+
+    alert("Upload Completed ✅");
+    loadStudents();
+  };
+
+  reader.readAsText(file);
+}
+
+// DOWNLOAD
+async function downloadData(){
+  let res = await fetch(API);
+  let data = await res.json();
+
+  let csv = data.map(r=>r.join(",")).join("\n");
+
+  let blob = new Blob([csv]);
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download="students.csv";
+  a.click();
+}
+
+// CLEAR UI
+function clearAll(){
+  studentTable.innerHTML="";
+}
+
+// LOGOUT
+function logout(){
+  location.href="index.html";
+}
+</script>
+<script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        getDocs,
+        deleteDoc,
+        doc,
+      } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCdj8k7LPD560VDPfoAYjUaA922p0DjfGg",
+        authDomain: "mc-satya.firebaseapp.com",
+        projectId: "mc-satya",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      const adminList = document.getElementById("adminList");
+
+      window.addMaterial = async function () {
+        const title = document.getElementById("title").value;
+        const pdfUrl = document.getElementById("pdfUrl").value;
+
+        if (!title || !pdfUrl) {
+          alert("Please fill all fields");
+          return;
+        }
+
+        await addDoc(collection(db, "materials"), {
+          title,
+          pdfUrl,
+        });
+
+        alert("Material Added");
+        loadMaterials();
+      };
+
+      window.loadMaterials = async function () {
+        adminList.innerHTML = "";
+        const snapshot = await getDocs(collection(db, "materials"));
+
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+
+          const div = document.createElement("div");
+          div.className =
+            "flex justify-between items-center p-2 border rounded mb-2 text-sm";
+
+          div.innerHTML = `
+      <span>${data.title}</span>
+      <button onclick="deleteMaterial('${docSnap.id}')" class="text-red-500">Delete</button>
+    `;
+
+          adminList.appendChild(div);
+        });
+      };
+
+      window.deleteMaterial = async function (id) {
+        if (confirm("Delete this material?")) {
+          await deleteDoc(doc(db, "materials", id));
+          loadMaterials();
+        }
+      };
+
+      window.onload = loadMaterials;
+    </script>
+
+</body>
+</html>

@@ -101,33 +101,32 @@
     }
 
     /* CARDS */
-    .cards{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:20px;
-    }
+    .cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
 
-    .card{
-      background:white;
-      padding:25px;
-      border-radius:15px;
-      text-align:center;
-      font-weight:500;
-      box-shadow:0 8px 20px rgba(0,0,0,0.1);
-      transition:0.3s;
-      cursor:pointer;
-    }
+.card {
+  text-decoration: none;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  color: #333;
+  font-weight: 500;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
 
-    .card:hover{
-      transform:translateY(-5px);
-      background:#2563eb;
-      color:white;
-    }
+.card:hover {
+  transform: translateY(-5px);
+}
 
-    .icon{
-      font-size:30px;
-      margin-bottom:10px;
-    }
+.icon {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
 
     /* MOBILE */
     .bottom-nav{display:none;}
@@ -189,23 +188,27 @@
   <div class="profile" id="profileData"></div>
 
   <!-- DASHBOARD CARDS -->
-  <div class="cards"> <div class="card"> <div class="icon" href="Smaterial.html">📚</div> Courses </div>
+<div class="cards">
 
-    <div class="card">
-      <div class="icon">📝</div>
-      Tests
-    </div>
+  <a href="Smaterial.html" class="card">
+    <div class="icon">📚</div>
+    Courses
+  </a>
 
-    <div class="card">
-      <div class="icon">📊</div>
-      Results
-    </div>
+  <a href="exam.html" class="card">
+    <div class="icon">📝</div>
+    Tests
+  </a>
 
-    <div class="card">
-      <div class="icon">⏱</div>
-      Progress
-    </div>
-  </div>
+  <a href="result.html" class="card">
+    <div class="icon">📊</div>
+    Results
+  </a>
+
+  <a href="progress.html" class="card">
+    <div class="icon">⏱</div>
+    Progress
+  </a>
 
 </div>
 

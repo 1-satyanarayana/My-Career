@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
+
+    body{
+      display:flex;
+      background:linear-gradient(135deg,#1e3a8a,#2563eb);
+      color:#111;
+    }
+
+    .sidebar{
+      width:230px;height:100vh;background:#111827;color:white;padding:20px;
+    }
+
+    .sidebar h2{text-align:center;margin-bottom:30px;}
+
+    .sidebar a{
+      display:block;padding:12px;margin:10px 0;color:white;
+      text-decoration:none;border-radius:8px;
+    }
+
+    .sidebar a:hover{background:#2563eb;}
+
+    .main{flex:1;padding:20px;}
+
+    .header{
+      background:white;padding:15px;border-radius:12px;margin-bottom:20px;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+
+    .header button{
+      background:red;color:white;border:none;padding:8px 15px;border-radius:6px;
+    }
+
+    .profile{
+      background:white;padding:20px;border-radius:12px;margin-bottom:20px;
+    }
+
+    .cards{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
+    }
+
+    .card{
+      background:white;padding:25px;border-radius:12px;text-align:center;
+      cursor:pointer;transition:0.3s;
+    }
+
+    .card:hover{
+      background:#2563eb;color:white;transform:translateY(-5px);
+    }
+
+    .icon{font-size:30px;margin-bottom:10px;}
+
+    /* MATERIAL SECTION */
+    .materialBox{
+      display:none;
+      margin-top:20px;
+      background:white;
+      padding:15px;
+      border-radius:12px;
+    }
+
+    .list{
+      max-height:300px;
+      overflow:auto;
+    }
+
+    .item{
+      padding:10px;
+      border:1px solid #ddd;
+      margin-bottom:8px;
+      border-radius:6px;
+      cursor:pointer;
+    }
+
+    .item:hover{
+      background:#2563eb;
+      color:white;
+    }
+
+    iframe{
+      width:100%;
+      height:400px;
+      border:none;
+      margin-top:10px;
+    }
+
+    /* MOBILE NAV */
+    .bottom-nav{display:none;}
+
+    @media(max-width:768px){
+      body{display:block;}
+      .sidebar{display:none;}
+      .cards{grid-template-columns:1fr 1fr;}
+
+      .bottom-nav{
+        display:flex;
+        position:fixed;
+        bottom:0;
+        width:100%;
+        background:white;
+        justify-content:space-around;
+        padding:12px 0;
+        box-shadow:0 -2px 10px rgba(0,0,0,0.1);
+        z-index:1000;
+      }
+
+      .bottom-nav div{
+        font-size:22px;
+        cursor:pointer;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>🎓 LMS</h2>
+  <a href="students.html">🏠 Dashboard</a>
+  <a onclick="openMaterials()">📚 Materials</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <h3 id="welcome"></h3>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="profile" id="profileData"></div>
+
+  <!-- CARDS -->
+  <div class="cards">
+    <div class="card" onclick="openMaterials()">
+      <div class="icon">📚</div>
+      Materials
+    </div>
+
+    <div class="card" onclick="showTests()">
+      <div class="icon">📝</div>
+      Tests
+    </div>
+
+    <div class="card" onclick="showResults()">
+      <div class="icon">📊</div>
+      Results
+    </div>
+
+    <div class="card">
+      <div class="icon">⏱</div>
+      Progress
+    </div>
+  </div>
+
+  <!-- MATERIAL SECTION -->
+  <div class="materialBox" id="materialBox">
+
+    <h3>📚 Study Materials</h3>
+
+    <input type="text" placeholder="Search..." onkeyup="filter(this.value)" style="width:100%;padding:8px;margin:10px 0;">
+
+    <div class="list" id="materialList"></div>
+
+    <iframe id="viewer" style="display:none;"></iframe>
+
+  </div>
+
+</div>
+
+<!-- MOBILE NAV -->
+<div class="bottom-nav">
+  <div onclick="goHome()">🏠</div>
+  <div onclick="openMaterials()">📚</div>
+  <div onclick="showTests()">📝</div>
+  <div onclick="showResults()">📊</div>
+</div>
+
+<script>
+
+// USER DATA
+let name = localStorage.getItem("studentName") || "Student";
+let roll = localStorage.getItem("roll") || "-";
+let branch = localStorage.getItem("branch") || "-";
+let section = localStorage.getItem("section") || "-";
+let college = localStorage.getItem("college") || "-";
+
+document.getElementById("welcome").innerText = "Welcome " + name;
+
+document.getElementById("profileData").innerHTML = `
+  <h3>👤 Student Profile</h3>
+  <p><b>Name:</b> ${name}</p>
+  <p><b>Roll Number:</b> ${roll}</p>
+  <p><b>Branch - Section:</b> ${branch} - ${section}</p>
+  <p><b>College:</b> ${college}</p>
+`;
+
+// NAVIGATION
+function goHome(){
+  document.getElementById("materialBox").style.display="none";
+  window.scrollTo(0,0);
+}
+
+function openMaterials(){
+  document.getElementById("materialBox").style.display="block";
+}
+
+function showTests(){
+  alert("Tests Coming Soon 📝");
+}
+
+function showResults(){
+  alert("Results Coming Soon 📊");
+}
+
+// LOGOUT
+function logout(){
+  localStorage.clear();
+  location.href="index.html";
+}
+
+// VIEW PDF
+function openPDF(url){
+  let viewer = document.getElementById("viewer");
+  viewer.src = url + "#toolbar=0";
+  viewer.style.display="block";
+}
+
+// SEARCH
+function filter(val){
+  let items = document.querySelectorAll(".item");
+  items.forEach(i=>{
+    i.style.display = i.innerText.toLowerCase().includes(val.toLowerCase()) ? "block":"none";
+  });
+}
+
+// DISABLE RIGHT CLICK
+document.addEventListener("contextmenu", e=>e.preventDefault());
+
+</script>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCdj8k7LPD560VDPfoAYjUaA922p0DjfGg",
+  authDomain: "mc-satya.firebaseapp.com",
+  projectId: "mc-satya",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function loadMaterials(){
+  let list = document.getElementById("materialList");
+  list.innerHTML="Loading...";
+
+  let snap = await getDocs(collection(db,"materials"));
+
+  let html="";
+
+  snap.forEach(d=>{
+    let m = d.data();
+
+    html += `
+      <div class="item" onclick="openPDF('${m.url}')">
+        📄 ${m.title}
+      </div>
+    `;
+  });
+
+  list.innerHTML = html;
+}
+
+loadMaterials();
+
+</script>
+
+</body>
+</html>

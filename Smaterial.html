@@ -125,7 +125,7 @@
 <!-- SIDEBAR -->
 <div class="sidebar">
   <h2>🎓 LMS</h2>
-  <a href="students.html">🏠 Dashboard</a>
+  <a href="#">🏠 Dashboard</a>
   <a onclick="openMaterials()">📚 Materials</a>
 </div>
 
@@ -229,10 +229,26 @@ function logout(){
   location.href="index.html";
 }
 
+// FIX GOOGLE DRIVE LINKS
+function fixDriveLink(url){
+  if(url.includes("drive.google.com") && url.includes("/view")){
+    return url.replace("/view","/preview");
+  }
+  return url;
+}
+
 // VIEW PDF
 function openPDF(url){
+  if(!url){
+    alert("Invalid PDF link ❌");
+    return;
+  }
+
   let viewer = document.getElementById("viewer");
-  viewer.src = url + "#toolbar=0";
+
+  let fixedUrl = fixDriveLink(url);
+
+  viewer.src = fixedUrl + "#toolbar=0";
   viewer.style.display="block";
 }
 
@@ -278,8 +294,10 @@ async function loadMaterials(){
   snap.forEach(d=>{
     let m = d.data();
 
+    let link = m.url || m.pdfUrl; // FIX BOTH CASES
+
     html += `
-      <div class="item" onclick="openPDF('${m.url}')">
+      <div class="item" onclick="openPDF('${link}')">
         📄 ${m.title}
       </div>
     `;
